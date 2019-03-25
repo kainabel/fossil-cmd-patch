@@ -1,0 +1,325 @@
+Index: src/checkin.c
+==================================================================
+--- src/checkin.c
++++ src/checkin.c
+@@ -349,11 +349,13 @@
+   if( relPathOption ){ relativePaths = 1; }
+   return relativePaths;
+ }
+ 
+ /*
++** COMMAND: ch*
+ ** COMMAND: changes
++** COMMAND: st*
+ ** COMMAND: status
+ **
+ ** Usage: %fossil changes|status ?OPTIONS? ?PATHS ...?
+ **
+ ** Report the change status of files in the current checkout.  If one or
+@@ -803,10 +805,11 @@
+   }
+   db_finalize(&q);
+ }
+ 
+ /*
++** COMMAND: ex
+ ** COMMAND: extras
+ **
+ ** Usage: %fossil extras ?OPTIONS? ?PATH1 ...?
+ **
+ ** Print a list of all files in the source tree that are not part of the
+@@ -874,10 +877,11 @@
+   }
+   blob_reset(&report);
+ }
+ 
+ /*
++** COMMAND: cl*
+ ** COMMAND: clean
+ **
+ ** Usage: %fossil clean ?OPTIONS? ?PATH ...?
+ **
+ ** Delete all "extra" files in the source tree.  "Extra" files are files
+
+Index: src/descendants.c
+==================================================================
+--- src/descendants.c
++++ src/descendants.c
+@@ -265,10 +265,11 @@
+     rid, N
+   );
+ }
+ 
+ /*
++** COMMAND: de*
+ ** COMMAND: descendants*
+ **
+ ** Usage: %fossil descendants ?CHECKIN? ?OPTIONS?
+ **
+ ** Find all leaf descendants of the check-in specified or if the argument
+
+Index: src/diff.c
+==================================================================
+--- src/diff.c
++++ src/diff.c
+@@ -1949,22 +1949,22 @@
+ 
+ /*
+ ** Process diff-related command-line options and return an appropriate
+ ** "diffFlags" integer.
+ **
+-**   --brief                    Show filenames only    DIFF_BRIEF
++**   --brief|-q                 Show filenames only    DIFF_BRIEF
+ **   -c|--context N             N lines of context.    DIFF_CONTEXT_MASK
+ **   --html                     Format for HTML        DIFF_HTML
+ **   --invert                   Invert the diff        DIFF_INVERT
+ **   -n|--linenum               Show line numbers      DIFF_LINENO
+ **   --noopt                    Disable optimization   DIFF_NOOPT
+ **   --numstat                  Show change counts     DIFF_NUMSTAT
+ **   --strip-trailing-cr        Strip trailing CR      DIFF_STRIP_EOLCR
+-**   --unified                  Unified diff.          ~DIFF_SIDEBYSIDE
++**   -u|--unified               Unified diff.          ~DIFF_SIDEBYSIDE
+ **   -w|--ignore-all-space      Ignore all whitespaces DIFF_IGNORE_ALLWS
+ **   -W|--width N               N character lines.     DIFF_WIDTH_MASK
+-**   -y|--side-by-side          Side-by-side diff.     DIFF_SIDEBYSIDE
++**   -y|--side-by-side|--yy     Side-by-side diff.     DIFF_SIDEBYSIDE
+ **   -Z|--ignore-trailing-space Ignore eol-whitespaces DIFF_IGNORE_EOLWS
+ */
+ u64 diff_options(void){
+   u64 diffFlags = 0;
+   const char *z;
+@@ -1980,11 +1980,11 @@
+   }
+   if( find_option("side-by-side","y",0)!=0 ) diffFlags |= DIFF_SIDEBYSIDE;
+   if( find_option("yy",0,0)!=0 ){
+     diffFlags |= DIFF_SIDEBYSIDE | DIFF_SLOW_SBS;
+   }
+-  if( find_option("unified",0,0)!=0 ) diffFlags &= ~DIFF_SIDEBYSIDE;
++  if( find_option("unified","u",0)!=0 ) diffFlags &= ~DIFF_SIDEBYSIDE;
+   if( (z = find_option("context","c",1))!=0 && (f = atoi(z))>=0 ){
+     if( f > DIFF_CONTEXT_MASK ) f = DIFF_CONTEXT_MASK;
+     diffFlags |= f + DIFF_CONTEXT_EX;
+   }
+   if( (z = find_option("width","W",1))!=0 && (f = atoi(z))>0 ){
+@@ -1995,11 +1995,11 @@
+   if( find_option("html",0,0)!=0 ) diffFlags |= DIFF_HTML;
+   if( find_option("linenum","n",0)!=0 ) diffFlags |= DIFF_LINENO;
+   if( find_option("noopt",0,0)!=0 ) diffFlags |= DIFF_NOOPT;
+   if( find_option("numstat",0,0)!=0 ) diffFlags |= DIFF_NUMSTAT;
+   if( find_option("invert",0,0)!=0 ) diffFlags |= DIFF_INVERT;
+-  if( find_option("brief",0,0)!=0 ) diffFlags |= DIFF_BRIEF;
++  if( find_option("brief","q",0)!=0 ) diffFlags |= DIFF_BRIEF;
+   return diffFlags;
+ }
+ 
+ /*
+ ** COMMAND: test-rawdiff
+@@ -2029,10 +2029,11 @@
+     blob_reset(&b);
+   }
+ }
+ 
+ /*
++** COMMAND: fdiff*
+ ** COMMAND: test-diff
+ **
+ ** Usage: %fossil [options] FILE1 FILE2
+ **
+ ** Print the difference between two files.  The usual diff options apply.
+
+Index: src/diffcmd.c
+==================================================================
+--- src/diffcmd.c
++++ src/diffcmd.c
+@@ -827,11 +827,11 @@
+ ** This option overrides the "binary-glob" setting.
+ **
+ ** Options:
+ **   --binary PATTERN           Treat files that match the glob PATTERN as binary
+ **   --branch BRANCH            Show diff of all changes on BRANCH
+-**   --brief                    Show filenames only
++**   --brief|-q                 Show filenames only
+ **   --checkin VERSION          Show diff of all changes in VERSION
+ **   --command PROG             External diff program - overrides "diff-command"
+ **   --context|-c N             Use N lines of context
+ **   --diff-binary BOOL         Include binary files when using external commands
+ **   --exec-abs-paths           Force absolute path names with external commands.
+@@ -838,16 +838,16 @@
+ **   --exec-rel-paths           Force relative path names with external commands.
+ **   --from|-r VERSION          Select VERSION as source for the diff
+ **   --internal|-i              Use internal diff logic
+ **   --new-file|-N              Show complete text of added and deleted files
+ **   --numstat                  Show only the number of lines delete and added
+-**   --side-by-side|-y          Side-by-side diff
++**   --side-by-side|-y|--yy     Side-by-side diff
+ **   --strip-trailing-cr        Strip trailing CR
+ **   --tk                       Launch a Tcl/Tk GUI for display
+ **   --to VERSION               Select VERSION as target for the diff
+ **   --undo                     Diff against the "undo" buffer
+-**   --unified                  Unified diff
++**   -u|--unified               Unified diff
+ **   -v|--verbose               Output complete text of added or deleted files
+ **   -w|--ignore-all-space      Ignore white space when comparing lines
+ **   -W|--width <num>           Width of lines in side-by-side diff
+ **   -Z|--ignore-trailing-space Ignore changes to end-of-line whitespace
+ */
+
+Index: src/info.c
+==================================================================
+--- src/info.c
++++ src/info.c
+@@ -169,10 +169,11 @@
+   }
+ }
+ 
+ 
+ /*
++** COMMAND: in*
+ ** COMMAND: info
+ **
+ ** Usage: %fossil info ?VERSION | REPOSITORY_FILENAME? ?OPTIONS?
+ **
+ ** With no arguments, provide information about the current tree.
+
+Index: src/main.c
+==================================================================
+--- src/main.c
++++ src/main.c
+@@ -732,11 +732,11 @@
+     if( find_option("utc",0,0) ) g.fTimeFormat = 1;
+     if( find_option("localtime",0,0) ) g.fTimeFormat = 2;
+     if( zChdir && file_chdir(zChdir, 0) ){
+       fossil_fatal("unable to change directories to %s", zChdir);
+     }
+-    if( find_option("help",0,0)!=0 ){
++    if( find_option("help","h",0)!=0 ){
+       /* If --help is found anywhere on the command line, translate the command
+        * to "fossil help cmdname" where "cmdname" is the first argument that
+        * does not begin with a "-" character.  If all arguments start with "-",
+        * translate to "fossil help argv[1] argv[2]...". */
+       int i, nNewArgc;
+
+Index: src/publish.c
+==================================================================
+--- src/publish.c
++++ src/publish.c
+@@ -21,10 +21,11 @@
+ #include "config.h"
+ #include "publish.h"
+ #include <assert.h>
+ 
+ /*
++** COMMAND: private*
+ ** COMMAND: unpublished
+ **
+ ** Usage: %fossil unpublished ?OPTIONS?
+ **
+ ** Show a list of unpublished or "private" artifacts.  Unpublished artifacts
+
+Index: src/regexp.c
+==================================================================
+--- src/regexp.c
++++ src/regexp.c
+@@ -748,10 +748,11 @@
+   }
+   return cnt;
+ }
+ 
+ /*
++** COMMAND: fgrep*
+ ** COMMAND: test-grep
+ **
+ ** Usage: %fossil test-grep REGEXP [FILE...]
+ **
+ ** Run a regular expression match over the named disk files, or against
+
+Index: src/stash.c
+==================================================================
+--- src/stash.c
++++ src/stash.c
+@@ -506,13 +506,15 @@
+   }
+   return stashid;
+ }
+ 
+ /*
++** COMMAND: ss*
++** COMMAND: pool
+ ** COMMAND: stash
+ **
+-** Usage: %fossil stash SUBCOMMAND ARGS...
++** Usage: %fossil stash|pool SUBCOMMAND ARGS...
+ **
+ **  fossil stash
+ **  fossil stash save ?-m|--comment COMMENT? ?FILES...?
+ **  fossil stash snapshot ?-m|--comment COMMENT? ?FILES...?
+ **
+@@ -583,11 +585,11 @@
+   db_must_be_within_tree();
+   db_open_config(0, 0);
+   db_begin_transaction();
+   stash_tables_exist_and_current();
+   if( g.argc<=2 ){
+-    zCmd = "save";
++    zCmd = "list";
+   }else{
+     zCmd = g.argv[2];
+   }
+   nCmd = strlen(zCmd);
+   if( memcmp(zCmd, "save", nCmd)==0 ){
+
+Index: src/tar.c
+==================================================================
+--- src/tar.c
++++ src/tar.c
+@@ -580,10 +580,11 @@
+   blob_reset(&filename);
+   tar_finish(pTar);
+ }
+ 
+ /*
++** COMMAND: tgz*
+ ** COMMAND: tarball*
+ **
+ ** Usage: %fossil tarball VERSION OUTPUTFILE [OPTIONS]
+ **
+ ** Generate a compressed tarball for a specified version.  If the --name
+
+Index: src/timeline.c
+==================================================================
+--- src/timeline.c
++++ src/timeline.c
+@@ -2507,13 +2507,14 @@
+   return db_int(0, "SELECT EXISTS (SELECT julianday(%Q) AS jd"
+                    " WHERE jd IS NOT NULL)", zDate);
+ }
+ 
+ /*
++** COMMAND: tl
+ ** COMMAND: timeline
+ **
+-** Usage: %fossil timeline ?WHEN? ?CHECKIN|DATETIME? ?OPTIONS?
++** Usage: %fossil timeline|tl ?WHEN? ?CHECKIN|DATETIME? ?OPTIONS?
+ **
+ ** Print a summary of activity going backwards in date and time
+ ** specified or from the current date and time if no arguments
+ ** are given.  The WHEN argument can be any unique abbreviation
+ ** of one of these keywords:
+
+Index: src/update.c
+==================================================================
+--- src/update.c
++++ src/update.c
+@@ -752,10 +752,11 @@
+   /* Return 1 on success and (assuming fatal is not set) 0 if not found. */
+   return result;
+ }
+ 
+ /*
++** COMMAND: re*
+ ** COMMAND: revert
+ **
+ ** Usage: %fossil revert ?-r REVISION? ?FILE ...?
+ **
+ ** Revert to the current repository version of FILE, or to
+
