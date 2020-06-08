@@ -1,5 +1,4 @@
-Index: src/checkin.c
-==================================================================
+CHANGED src/checkin.c
 --- src/checkin.c
 +++ src/checkin.c
 @@ -349,11 +349,13 @@
@@ -41,11 +40,10 @@ Index: src/checkin.c
  **
  ** Delete all "extra" files in the source tree.  "Extra" files are files
 
-Index: src/descendants.c
-==================================================================
+CHANGED src/descendants.c
 --- src/descendants.c
 +++ src/descendants.c
-@@ -265,10 +265,11 @@
+@@ -290,10 +290,11 @@
      rid, N
    );
  }
@@ -58,11 +56,10 @@ Index: src/descendants.c
  **
  ** Find all leaf descendants of the check-in specified or if the argument
 
-Index: src/diff.c
-==================================================================
+CHANGED src/diff.c
 --- src/diff.c
 +++ src/diff.c
-@@ -1949,22 +1949,22 @@
+@@ -1979,22 +1979,22 @@
  
  /*
  ** Process diff-related command-line options and return an appropriate
@@ -88,7 +85,7 @@ Index: src/diff.c
  u64 diff_options(void){
    u64 diffFlags = 0;
    const char *z;
-@@ -1980,11 +1980,11 @@
+@@ -2010,11 +2010,11 @@
    }
    if( find_option("side-by-side","y",0)!=0 ) diffFlags |= DIFF_SIDEBYSIDE;
    if( find_option("yy",0,0)!=0 ){
@@ -101,7 +98,7 @@ Index: src/diff.c
      diffFlags |= f + DIFF_CONTEXT_EX;
    }
    if( (z = find_option("width","W",1))!=0 && (f = atoi(z))>0 ){
-@@ -1995,11 +1995,11 @@
+@@ -2025,11 +2025,11 @@
    if( find_option("html",0,0)!=0 ) diffFlags |= DIFF_HTML;
    if( find_option("linenum","n",0)!=0 ) diffFlags |= DIFF_LINENO;
    if( find_option("noopt",0,0)!=0 ) diffFlags |= DIFF_NOOPT;
@@ -114,7 +111,7 @@ Index: src/diff.c
  
  /*
  ** COMMAND: test-rawdiff
-@@ -2029,10 +2029,11 @@
+@@ -2059,10 +2059,11 @@
      blob_reset(&b);
    }
  }
@@ -127,11 +124,10 @@ Index: src/diff.c
  **
  ** Print the difference between two files.  The usual diff options apply.
 
-Index: src/diffcmd.c
-==================================================================
+CHANGED src/diffcmd.c
 --- src/diffcmd.c
 +++ src/diffcmd.c
-@@ -827,11 +827,11 @@
+@@ -817,11 +817,11 @@
  ** This option overrides the "binary-glob" setting.
  **
  ** Options:
@@ -144,7 +140,7 @@ Index: src/diffcmd.c
  **   --context|-c N             Use N lines of context
  **   --diff-binary BOOL         Include binary files when using external commands
  **   --exec-abs-paths           Force absolute path names with external commands.
-@@ -838,16 +838,16 @@
+@@ -828,17 +828,17 @@
  **   --exec-rel-paths           Force relative path names with external commands.
  **   --from|-r VERSION          Select VERSION as source for the diff
  **   --internal|-i              Use internal diff logic
@@ -153,6 +149,7 @@ Index: src/diffcmd.c
 -**   --side-by-side|-y          Side-by-side diff
 +**   --side-by-side|-y|--yy     Side-by-side diff
  **   --strip-trailing-cr        Strip trailing CR
+ **   --tclsh PATH               Tcl/Tk used for --tk (default: "tclsh")
  **   --tk                       Launch a Tcl/Tk GUI for display
  **   --to VERSION               Select VERSION as target for the diff
  **   --undo                     Diff against the "undo" buffer
@@ -164,14 +161,13 @@ Index: src/diffcmd.c
  **   -Z|--ignore-trailing-space Ignore changes to end-of-line whitespace
  */
 
-Index: src/info.c
-==================================================================
+CHANGED src/info.c
 --- src/info.c
 +++ src/info.c
-@@ -169,10 +169,11 @@
+@@ -168,10 +168,11 @@
+                  db_get("parent-project-name",""));
    }
  }
- 
  
  /*
 +** COMMAND: in*
@@ -181,11 +177,10 @@ Index: src/info.c
  **
  ** With no arguments, provide information about the current tree.
 
-Index: src/main.c
-==================================================================
+CHANGED src/main.c
 --- src/main.c
 +++ src/main.c
-@@ -732,11 +732,11 @@
+@@ -758,11 +758,11 @@
      if( find_option("utc",0,0) ) g.fTimeFormat = 1;
      if( find_option("localtime",0,0) ) g.fTimeFormat = 2;
      if( zChdir && file_chdir(zChdir, 0) ){
@@ -199,8 +194,7 @@ Index: src/main.c
         * translate to "fossil help argv[1] argv[2]...". */
        int i, nNewArgc;
 
-Index: src/publish.c
-==================================================================
+CHANGED src/publish.c
 --- src/publish.c
 +++ src/publish.c
 @@ -21,10 +21,11 @@
@@ -216,11 +210,10 @@ Index: src/publish.c
  **
  ** Show a list of unpublished or "private" artifacts.  Unpublished artifacts
 
-Index: src/regexp.c
-==================================================================
+CHANGED src/regexp.c
 --- src/regexp.c
 +++ src/regexp.c
-@@ -748,10 +748,11 @@
+@@ -753,10 +753,11 @@
    }
    return cnt;
  }
@@ -233,8 +226,7 @@ Index: src/regexp.c
  **
  ** Run a regular expression match over the named disk files, or against
 
-Index: src/stash.c
-==================================================================
+CHANGED src/stash.c
 --- src/stash.c
 +++ src/stash.c
 @@ -506,13 +506,15 @@
@@ -268,8 +260,7 @@ Index: src/stash.c
    nCmd = strlen(zCmd);
    if( memcmp(zCmd, "save", nCmd)==0 ){
 
-Index: src/tar.c
-==================================================================
+CHANGED src/tar.c
 --- src/tar.c
 +++ src/tar.c
 @@ -580,10 +580,11 @@
@@ -285,11 +276,10 @@ Index: src/tar.c
  **
  ** Generate a compressed tarball for a specified version.  If the --name
 
-Index: src/timeline.c
-==================================================================
+CHANGED src/timeline.c
 --- src/timeline.c
 +++ src/timeline.c
-@@ -2507,13 +2507,14 @@
+@@ -2761,13 +2761,14 @@
    return db_int(0, "SELECT EXISTS (SELECT julianday(%Q) AS jd"
                     " WHERE jd IS NOT NULL)", zDate);
  }
@@ -306,11 +296,10 @@ Index: src/timeline.c
  ** are given.  The WHEN argument can be any unique abbreviation
  ** of one of these keywords:
 
-Index: src/update.c
-==================================================================
+CHANGED src/update.c
 --- src/update.c
 +++ src/update.c
-@@ -752,10 +752,11 @@
+@@ -763,10 +763,11 @@
    /* Return 1 on success and (assuming fatal is not set) 0 if not found. */
    return result;
  }
@@ -319,7 +308,7 @@ Index: src/update.c
 +** COMMAND: re*
  ** COMMAND: revert
  **
- ** Usage: %fossil revert ?-r REVISION? ?FILE ...?
+ ** Usage: %fossil revert ?OPTIONS? ?FILE ...?
  **
  ** Revert to the current repository version of FILE, or to
 
