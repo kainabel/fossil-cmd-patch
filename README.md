@@ -102,7 +102,7 @@ My currently preferred build options:
 or
 `./configure --disable-fusefs --json --with-openssl=auto`
 or
-nmake /f Makefile.msc FOSSIL_ENABLE_SSL=1 FOSSIL_ENABLE_JSON=1 FOSSIL_ENABLE_TCL=1 OPTIMIZATIONS=4 clean fossil.exe
+`nmake /f Makefile.msc FOSSIL_ENABLE_SSL=1 FOSSIL_ENABLE_JSON=1 FOSSIL_ENABLE_TCL=1 OPTIMIZATIONS=4 clean fossil.exe`
 
 See also:
 
