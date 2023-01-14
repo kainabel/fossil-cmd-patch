@@ -1,191 +1,228 @@
-CHANGED src/checkin.c
+Index: src/add.c
+==================================================================
+--- src/add.c
++++ src/add.c
+@@ -739,10 +739,11 @@
+   return filenames_are_case_sensitive() ? "" : "COLLATE nocase";
+ }
+ 
+ /*
+ ** COMMAND: addremove
++** COMMAND: addrm*
+ **
+ ** Usage: %fossil addremove ?OPTIONS?
+ **
+ ** Do all necessary "[[add]]" and "[[rm]]" commands to synchronize the
+ ** repository with the content of the working checkout:
+
+Index: src/checkin.c
+==================================================================
 --- src/checkin.c
 +++ src/checkin.c
-@@ -349,11 +349,13 @@
-   if( relPathOption ){ relativePaths = 1; }
+@@ -363,11 +363,13 @@
    return relativePaths;
  }
  
  /*
-+** COMMAND: ch*
  ** COMMAND: changes
-+** COMMAND: st*
++** COMMAND: ch#
  ** COMMAND: status
++** COMMAND: st#
  **
  ** Usage: %fossil changes|status ?OPTIONS? ?PATHS ...?
  **
  ** Report the change status of files in the current checkout.  If one or
-@@ -803,10 +805,11 @@
-   }
+ ** more PATHS are specified, only changes among the named files and
+@@ -823,10 +825,11 @@
    db_finalize(&q);
  }
  
  /*
-+** COMMAND: ex
  ** COMMAND: extras
++** COMMAND: ex#
  **
  ** Usage: %fossil extras ?OPTIONS? ?PATH1 ...?
  **
  ** Print a list of all files in the source tree that are not part of the
-@@ -874,10 +877,11 @@
-   }
+ ** current checkout. See also the "clean" command. If paths are specified,
+@@ -892,10 +895,11 @@
    blob_reset(&report);
  }
  
  /*
-+** COMMAND: cl*
  ** COMMAND: clean
++** COMMAND: cl#
  **
  ** Usage: %fossil clean ?OPTIONS? ?PATH ...?
  **
  ** Delete all "extra" files in the source tree.  "Extra" files are files
+ ** that are not officially part of the checkout.  If one or more PATH
 
-CHANGED src/descendants.c
+Index: src/descendants.c
+==================================================================
 --- src/descendants.c
 +++ src/descendants.c
-@@ -290,10 +290,11 @@
-     rid, N
+@@ -336,10 +336,11 @@
    );
  }
  
  /*
-+** COMMAND: de*
  ** COMMAND: descendants*
++** COMMAND: de#
  **
  ** Usage: %fossil descendants ?CHECKIN? ?OPTIONS?
  **
  ** Find all leaf descendants of the check-in specified or if the argument
+ ** is omitted, of the check-in currently checked out.
 
-CHANGED src/diff.c
+Index: src/diff.c
+==================================================================
 --- src/diff.c
 +++ src/diff.c
-@@ -1979,22 +1979,22 @@
- 
- /*
+@@ -3094,19 +3094,19 @@
+ ** Initialize the DiffConfig object using command-line options.
+ **
  ** Process diff-related command-line options and return an appropriate
  ** "diffFlags" integer.
  **
--**   --brief                    Show filenames only    DIFF_BRIEF
-+**   --brief|-q                 Show filenames only    DIFF_BRIEF
- **   -c|--context N             N lines of context.    DIFF_CONTEXT_MASK
- **   --html                     Format for HTML        DIFF_HTML
- **   --invert                   Invert the diff        DIFF_INVERT
- **   -n|--linenum               Show line numbers      DIFF_LINENO
- **   --noopt                    Disable optimization   DIFF_NOOPT
- **   --numstat                  Show change counts     DIFF_NUMSTAT
- **   --strip-trailing-cr        Strip trailing CR      DIFF_STRIP_EOLCR
--**   --unified                  Unified diff.          ~DIFF_SIDEBYSIDE
-+**   -u|--unified               Unified diff.          ~DIFF_SIDEBYSIDE
- **   -w|--ignore-all-space      Ignore all whitespaces DIFF_IGNORE_ALLWS
- **   -W|--width N               N character lines.     DIFF_WIDTH_MASK
--**   -y|--side-by-side          Side-by-side diff.     DIFF_SIDEBYSIDE
-+**   -y|--side-by-side|--yy     Side-by-side diff.     DIFF_SIDEBYSIDE
- **   -Z|--ignore-trailing-space Ignore eol-whitespaces DIFF_IGNORE_EOLWS
+-**   --brief                      Show filenames only        DIFF_BRIEF
++**   -q|--brief                   Show filenames only        DIFF_BRIEF
+ **   -c|--context N               N lines of context.        nContext
+ **   --html                       Format for HTML            DIFF_HTML
+ **   --invert                     Invert the diff            DIFF_INVERT
+ **   -n|--linenum                 Show line numbers          DIFF_LINENO
+ **   --noopt                      Disable optimization       DIFF_NOOPT
+ **   --numstat                    Show change counts         DIFF_NUMSTAT
+ **   --strip-trailing-cr          Strip trailing CR          DIFF_STRIP_EOLCR
+-**   --unified                    Unified diff.              ~DIFF_SIDEBYSIDE
++**   -u|--unified                 Unified diff.              ~DIFF_SIDEBYSIDE
+ **   -w|--ignore-all-space        Ignore all whitespaces     DIFF_IGNORE_ALLWS
+ **   -W|--width N                 N character lines.         wColumn
+ **   -y|--side-by-side            Side-by-side diff.         DIFF_SIDEBYSIDE
+ **   -Z|--ignore-trailing-space   Ignore eol-whitespaces     DIFF_IGNORE_EOLWS
  */
- u64 diff_options(void){
-   u64 diffFlags = 0;
-   const char *z;
-@@ -2010,11 +2010,11 @@
-   }
-   if( find_option("side-by-side","y",0)!=0 ) diffFlags |= DIFF_SIDEBYSIDE;
-   if( find_option("yy",0,0)!=0 ){
-     diffFlags |= DIFF_SIDEBYSIDE | DIFF_SLOW_SBS;
-   }
--  if( find_option("unified",0,0)!=0 ) diffFlags &= ~DIFF_SIDEBYSIDE;
-+  if( find_option("unified","u",0)!=0 ) diffFlags &= ~DIFF_SIDEBYSIDE;
-   if( (z = find_option("context","c",1))!=0 && (f = atoi(z))>=0 ){
-     if( f > DIFF_CONTEXT_MASK ) f = DIFF_CONTEXT_MASK;
-     diffFlags |= f + DIFF_CONTEXT_EX;
-   }
-   if( (z = find_option("width","W",1))!=0 && (f = atoi(z))>0 ){
-@@ -2025,11 +2025,11 @@
-   if( find_option("html",0,0)!=0 ) diffFlags |= DIFF_HTML;
+@@ -3129,11 +3129,11 @@
+     if( find_option("side-by-side","y",0)!=0 ) diffFlags |= DIFF_SIDEBYSIDE;
+     if( find_option("yy",0,0)!=0 ){
+       diffFlags |= DIFF_SIDEBYSIDE | DIFF_SLOW_SBS;
+     }
+     if( find_option("html",0,0)!=0 ) diffFlags |= DIFF_HTML;
+-    if( find_option("unified",0,0)!=0 ) diffFlags &= ~DIFF_SIDEBYSIDE;
++    if( find_option("unified","u",0)!=0 ) diffFlags &= ~DIFF_SIDEBYSIDE;
+     if( find_option("webpage",0,0)!=0 ){
+       diffFlags |= DIFF_HTML|DIFF_WEBPAGE|DIFF_LINENO;
+     }
+     if( find_option("browser","b",0)!=0 ){
+       diffFlags |= DIFF_HTML|DIFF_WEBPAGE|DIFF_LINENO|DIFF_BROWSER;
+@@ -3164,11 +3164,11 @@
    if( find_option("linenum","n",0)!=0 ) diffFlags |= DIFF_LINENO;
    if( find_option("noopt",0,0)!=0 ) diffFlags |= DIFF_NOOPT;
    if( find_option("numstat",0,0)!=0 ) diffFlags |= DIFF_NUMSTAT;
+   if( find_option("versions","h",0)!=0 ) diffFlags |= DIFF_SHOW_VERS;
    if( find_option("invert",0,0)!=0 ) diffFlags |= DIFF_INVERT;
 -  if( find_option("brief",0,0)!=0 ) diffFlags |= DIFF_BRIEF;
 +  if( find_option("brief","q",0)!=0 ) diffFlags |= DIFF_BRIEF;
-   return diffFlags;
- }
- 
- /*
- ** COMMAND: test-rawdiff
-@@ -2059,10 +2059,11 @@
-     blob_reset(&b);
-   }
- }
- 
- /*
-+** COMMAND: fdiff*
- ** COMMAND: test-diff
- **
- ** Usage: %fossil [options] FILE1 FILE2
- **
- ** Print the difference between two files.  The usual diff options apply.
+   if( find_option("internal","i",0)==0
+    && (diffFlags & (DIFF_HTML|DIFF_TCL|DIFF_DEBUG|DIFF_JSON))==0
+   ){
+     pCfg->zDiffCmd = find_option("command", 0, 1);
+     if( pCfg->zDiffCmd==0 ) pCfg->zDiffCmd = diff_command_external(isGDiff);
 
-CHANGED src/diffcmd.c
+Index: src/diffcmd.c
+==================================================================
 --- src/diffcmd.c
 +++ src/diffcmd.c
-@@ -817,11 +817,11 @@
- ** This option overrides the "binary-glob" setting.
+@@ -1023,10 +1023,11 @@
+ }
+ 
+ /*
+ ** COMMAND: diff
+ ** COMMAND: gdiff
++** COMMAND: tkdiff
+ **
+ ** Usage: %fossil diff|gdiff ?OPTIONS? ?FILE1? ?FILE2 ...?
+ **
+ ** Show the difference between the current version of each of the FILEs
+ ** specified (as they exist on disk) and that same file as it was checked
+@@ -1071,11 +1072,11 @@
  **
  ** Options:
- **   --binary PATTERN           Treat files that match the glob PATTERN as binary
- **   --branch BRANCH            Show diff of all changes on BRANCH
--**   --brief                    Show filenames only
-+**   --brief|-q                 Show filenames only
- **   --checkin VERSION          Show diff of all changes in VERSION
- **   --command PROG             External diff program - overrides "diff-command"
- **   --context|-c N             Use N lines of context
- **   --diff-binary BOOL         Include binary files when using external commands
- **   --exec-abs-paths           Force absolute path names with external commands.
-@@ -828,17 +828,17 @@
- **   --exec-rel-paths           Force relative path names with external commands.
- **   --from|-r VERSION          Select VERSION as source for the diff
- **   --internal|-i              Use internal diff logic
- **   --new-file|-N              Show complete text of added and deleted files
- **   --numstat                  Show only the number of lines delete and added
--**   --side-by-side|-y          Side-by-side diff
-+**   --side-by-side|-y|--yy     Side-by-side diff
- **   --strip-trailing-cr        Strip trailing CR
- **   --tclsh PATH               Tcl/Tk used for --tk (default: "tclsh")
- **   --tk                       Launch a Tcl/Tk GUI for display
- **   --to VERSION               Select VERSION as target for the diff
- **   --undo                     Diff against the "undo" buffer
--**   --unified                  Unified diff
-+**   -u|--unified               Unified diff
- **   -v|--verbose               Output complete text of added or deleted files
- **   -w|--ignore-all-space      Ignore white space when comparing lines
- **   -W|--width <num>           Width of lines in side-by-side diff
- **   -Z|--ignore-trailing-space Ignore changes to end-of-line whitespace
- */
+ **   --binary PATTERN            Treat files that match the glob PATTERN
+ **                               as binary
+ **   --branch BRANCH             Show diff of all changes on BRANCH
+-**   --brief                     Show filenames only
++**   -q|--brief                  Show filenames only
+ **   -b|--browser                Show the diff output in a web-browser
+ **   --by                        Shorthand for "--browser -y"
+ **   -ci|--checkin VERSION       Show diff of all changes in VERSION
+ **   --command PROG              External diff program. Overrides "diff-command"
+ **   -c|--context N              Show N lines of context around each change
+@@ -1093,11 +1094,11 @@
+ **   --tcl                       TCL-formated output used internally by --tk
+ **   --tclsh PATH                TCL/TK used for --tk (default: "tclsh")
+ **   --tk                        Launch a Tcl/Tk GUI for display
+ **   --to VERSION                Select VERSION as target for the diff
+ **   --undo                      Diff against the "undo" buffer
+-**   --unified                   Unified diff
++**   -u|--unified                Unified diff
+ **   -v|--verbose                Output complete text of added or deleted files
+ **   -h|--versions               Show compared versions in the diff header
+ **   --webpage                   Format output as a stand-alone HTML webpage
+ **   -W|--width N                Width of lines in side-by-side diff
+ **   -Z|--ignore-trailing-space  Ignore changes to end-of-line whitespace
+@@ -1110,11 +1111,11 @@
+   const char *zBranch;       /* Branch to diff */
+   int againstUndo = 0;       /* Diff against files in the undo buffer */
+   FileDirList *pFileDir = 0; /* Restrict the diff to these files */
+   DiffConfig DCfg;           /* Diff configuration object */
+ 
+-  if( find_option("tk",0,0)!=0 || has_option("tclsh") ){
++  if( (g.argv[1][0]=='t') || find_option("tk",0,0)!=0 || has_option("tclsh") ){
+     diff_tk("diff", 2);
+     return;
+   }
+   isGDiff = g.argv[1][0]=='g';
+   zFrom = find_option("from", "r", 1);
 
-CHANGED src/info.c
+Index: src/info.c
+==================================================================
 --- src/info.c
 +++ src/info.c
-@@ -168,10 +168,11 @@
-                  db_get("parent-project-name",""));
+@@ -169,10 +169,11 @@
    }
  }
  
  /*
-+** COMMAND: in*
  ** COMMAND: info
++** COMMAND: in#
  **
  ** Usage: %fossil info ?VERSION | REPOSITORY_FILENAME? ?OPTIONS?
  **
  ** With no arguments, provide information about the current tree.
+ ** If an argument is specified, provide information about the object
+@@ -3798,10 +3799,11 @@
+   return nRet;
+ }
+ 
+ /*
+ ** COMMAND: describe
++** COMMAND: des#
+ **
+ ** Usage: %fossil describe ?VERSION? ?OPTIONS?
+ **
+ ** Provide a description of the given VERSION by showing a non-propagating
+ ** tag of the youngest tagged ancestor, followed by the number of commits
 
-CHANGED src/main.c
+Index: src/main.c
+==================================================================
 --- src/main.c
 +++ src/main.c
-@@ -758,11 +758,11 @@
-     if( find_option("utc",0,0) ) g.fTimeFormat = 1;
-     if( find_option("localtime",0,0) ) g.fTimeFormat = 2;
-     if( zChdir && file_chdir(zChdir, 0) ){
-       fossil_fatal("unable to change directories to %s", zChdir);
+@@ -813,11 +813,11 @@
+           db_read_saved_encryption_key_from_process_via_th1(zSeeDbConfig);
+         }
+       }
      }
+ #endif
 -    if( find_option("help",0,0)!=0 ){
 +    if( find_option("help","h",0)!=0 ){
        /* If --help is found anywhere on the command line, translate the command
@@ -194,59 +231,58 @@ CHANGED src/main.c
         * translate to "fossil help argv[1] argv[2]...". */
        int i, nNewArgc;
 
-CHANGED src/publish.c
+Index: src/publish.c
+==================================================================
 --- src/publish.c
 +++ src/publish.c
-@@ -21,10 +21,11 @@
- #include "config.h"
+@@ -22,10 +22,11 @@
  #include "publish.h"
  #include <assert.h>
  
  /*
+ ** COMMAND: unpublished*
 +** COMMAND: private*
- ** COMMAND: unpublished
  **
  ** Usage: %fossil unpublished ?OPTIONS?
  **
  ** Show a list of unpublished or "private" artifacts.  Unpublished artifacts
+ ** will never push and hence will not be shared with collaborators.
 
-CHANGED src/regexp.c
+Index: src/regexp.c
+==================================================================
 --- src/regexp.c
 +++ src/regexp.c
-@@ -753,10 +753,11 @@
-   }
+@@ -802,10 +802,11 @@
    return cnt;
  }
  
  /*
-+** COMMAND: fgrep*
  ** COMMAND: test-grep
++** COMMAND: xgrep
  **
  ** Usage: %fossil test-grep REGEXP [FILE...]
  **
  ** Run a regular expression match over the named disk files, or against
+ ** standard input if no disk files are named on the command-line.
 
-CHANGED src/stash.c
+Index: src/stash.c
+==================================================================
 --- src/stash.c
 +++ src/stash.c
-@@ -506,13 +506,15 @@
-   }
+@@ -501,10 +501,12 @@
    return stashid;
  }
  
  /*
-+** COMMAND: ss*
-+** COMMAND: pool
  ** COMMAND: stash
++** COMMAND: ss#
++** COMMAND: pool
  **
--** Usage: %fossil stash SUBCOMMAND ARGS...
-+** Usage: %fossil stash|pool SUBCOMMAND ARGS...
+ ** Usage: %fossil stash SUBCOMMAND ARGS...
  **
- **  fossil stash
- **  fossil stash save ?-m|--comment COMMENT? ?FILES...?
- **  fossil stash snapshot ?-m|--comment COMMENT? ?FILES...?
- **
-@@ -583,11 +585,11 @@
+ ** > fossil stash
+ ** > fossil stash save ?-m|--comment COMMENT? ?FILES...?
+@@ -564,11 +566,11 @@
    db_must_be_within_tree();
    db_open_config(0, 0);
    db_begin_transaction();
@@ -260,55 +296,71 @@ CHANGED src/stash.c
    nCmd = strlen(zCmd);
    if( memcmp(zCmd, "save", nCmd)==0 ){
 
-CHANGED src/tar.c
+Index: src/tar.c
+==================================================================
 --- src/tar.c
 +++ src/tar.c
-@@ -580,10 +580,11 @@
-   blob_reset(&filename);
-   tar_finish(pTar);
+@@ -589,10 +589,11 @@
+   if( pTar ) tar_finish(pTar);
  }
  
  /*
-+** COMMAND: tgz*
  ** COMMAND: tarball*
++** COMMAND: tgz*
  **
  ** Usage: %fossil tarball VERSION OUTPUTFILE [OPTIONS]
  **
  ** Generate a compressed tarball for a specified version.  If the --name
+ ** option is used, its argument becomes the name of the top-level directory
 
-CHANGED src/timeline.c
+Index: src/timeline.c
+==================================================================
 --- src/timeline.c
 +++ src/timeline.c
-@@ -2761,13 +2761,14 @@
-   return db_int(0, "SELECT EXISTS (SELECT julianday(%Q) AS jd"
-                    " WHERE jd IS NOT NULL)", zDate);
+@@ -3088,10 +3088,11 @@
  }
  
+ 
  /*
-+** COMMAND: tl
  ** COMMAND: timeline
++** COMMAND: tl#
  **
--** Usage: %fossil timeline ?WHEN? ?CHECKIN|DATETIME? ?OPTIONS?
-+** Usage: %fossil timeline|tl ?WHEN? ?CHECKIN|DATETIME? ?OPTIONS?
+ ** Usage: %fossil timeline ?WHEN? ?CHECKIN|DATETIME? ?OPTIONS?
  **
  ** Print a summary of activity going backwards in date and time
  ** specified or from the current date and time if no arguments
- ** are given.  The WHEN argument can be any unique abbreviation
- ** of one of these keywords:
 
-CHANGED src/update.c
+Index: src/undo.c
+==================================================================
+--- src/undo.c
++++ src/undo.c
+@@ -420,10 +420,11 @@
+   undo_all_filesystem(0);
+ }
+ 
+ /*
+ ** COMMAND: undo
++** COMMAND: un#
+ ** COMMAND: redo*
+ **
+ ** Usage: %fossil undo ?OPTIONS? ?FILENAME...?
+ **    or: %fossil redo ?OPTIONS? ?FILENAME...?
+ **
+
+Index: src/update.c
+==================================================================
 --- src/update.c
 +++ src/update.c
-@@ -763,10 +763,11 @@
-   /* Return 1 on success and (assuming fatal is not set) 0 if not found. */
+@@ -789,10 +789,11 @@
    return result;
  }
  
  /*
-+** COMMAND: re*
  ** COMMAND: revert
++** COMMAND: re#
  **
  ** Usage: %fossil revert ?OPTIONS? ?FILE ...?
  **
  ** Revert to the current repository version of FILE, or to
+ ** the baseline VERSION specified with -r flag.
 
