@@ -67,9 +67,10 @@ The `-h` switch for global use has been added to display the `help`.
 >
 > You must use the long form of option -h in the following commands:
 >
-> `--html` at commands: `help`, `wiki`
-> `--versions` at command: `diff`
+> `--html` at commands: `help`, `wiki`\
+> `--versions` at command: `diff`\
 > `--dereference` at commands: `sha1sum`, `sha3sum`, `test-tarball`, `test-filezip`
+
 
 The command call of `fossil stash` without further options now points to `fossil stash list` and not to `fossil stash save` as before.
 
